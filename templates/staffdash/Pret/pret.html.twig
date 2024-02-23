@@ -1,0 +1,51 @@
+{% extends 'staffdash/index.html.twig' %}
+
+{% block body %}
+    <main id="main" class="main">
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+
+                <th>
+                    Montant
+                </th>
+                <th>interet</th>
+                <th>periode</th>
+                <th>Type</th>
+                <th>Description</th>
+
+            </tr>
+
+            </thead>
+            <tbody>
+            {%for  i in  pret %}
+                {% if i.accepte == false and i.refuse==false %}
+
+                <tr><th>{{i.Montant}}</th>
+                    <th>{{ i.Interet }}</th>
+                    <th>{{i.periode}}</th>
+                    <th>{{i.Type}}</th>
+                    <th>{{i.description}}</th>
+
+                    <th>
+                        <form method="post" action="{{ path('accepte', {'id': i.id}) }}">
+                            <button type="submit" class="btn btn-success">Accepter</button>
+                        </form>
+
+                        <form method="post" action="{{ path('refuse', {'id': i.id}) }}">
+                            <button type="submit" class="btn btn-danger">Refuser</button>
+                        </form>
+
+
+                        </th></tr>
+                {% endif %}
+
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </main>
+
+{% endblock %}
