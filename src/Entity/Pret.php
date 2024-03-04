@@ -220,6 +220,9 @@ class Pret
 
         return $this;
     }
-
+public function calcule()
+{
+    $this->Interet=($this->Montant *0.005 * $this->Periode)/100;
+}
 
 }

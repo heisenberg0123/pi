@@ -56,9 +56,22 @@ class ClientdashController extends AbstractController
 
     }
     #[Route('/List', name: 'pret')]
-    public function list(PretRepository $em)
+    public function list(PretRepository $em,Request $req)
     {
+
+        $type=$req->get('type');
         $author = $em->findAll();
+
+
+        if($req->get('ajax')) {
+            $author=$em->findByT($type);
+            return new JsonResponse([
+                'content'=> $this->renderView('clientdash/pret/Pret.html.twig', [
+                    'pret' => $author,
+
+                ])
+            ]);
+        }
 
         return $this->render('clientdash/pret/Pret.html.twig', [
             'pret' => $author,
@@ -73,11 +86,11 @@ public function add(Request $request){
         $pret->setStatus(false);
         $pret->setAccepte(false);
         $pret->setRefuse(false);
-        $pret->setInteret("10%");
+
         $form=$this->createForm(PretType::class, $pret);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid() ){
-            if ($pret->getMontant()>10000){
+            if ($pret->getMontant()>10000){        $pret->calcule();
                 $em=$this->getDoctrine()->getManager();
                 $em->persist($pret);
                 $em->flush();
@@ -93,6 +106,22 @@ public function add(Request $request){
         ]);
 
 }
+
+    #[Route('/calcule', name: 'calcule')]
+public function calcule(Request $request ,PretRepository $em)
+{
+$pret=new Pret();
+$pret->calcule();
+    $author = $em->findAll();
+
+    return $this->render('clientdash/pret/add.html.twig', [
+        'pret' => $author,
+
+    ]);
+
+
+}
+
 
     #[Route('/update/{id}', name: 'updatee')]
     public function update(PretRepository $em ,Request $request,$id ){
