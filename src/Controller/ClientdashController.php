@@ -79,7 +79,7 @@ class ClientdashController extends AbstractController
         ]);
     }
     #[Route('/add', name: 'addd')]
-public function add(Request $request){
+public function add(Request $request,){
         $pret=new Pret();
 
         $pret->setPretId(null);

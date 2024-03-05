@@ -27,7 +27,7 @@ class Pret
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message:"preiode is required")]
-    private ?string $Periode = null;
+    private ?int $Periode = null;
 
     #[ORM\Column(length: 255)]
     private ?string $Type = null;
@@ -90,12 +90,12 @@ class Pret
         return $this;
     }
 
-    public function getPeriode(): ?string
+    public function getPeriode(): ?int
     {
         return $this->Periode;
     }
 
-    public function setPeriode(string $Periode): static
+    public function setPeriode(int $Periode): static
     {
         $this->Periode = $Periode;
 

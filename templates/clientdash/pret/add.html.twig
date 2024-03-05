@@ -16,12 +16,15 @@
         <div class="form-group">
 
             {{ form_row(form.Type, {'attr': {'class': 'form-control mb-3'}}) }}
-           {{ form_row(form.Montant,  {'attr': {'class': 'form-control mb-2'}}) }}
-            {{ form_row(form.Periode, {'attr': {'class': 'form-control mb-2'}})}}
+            <label>Montant(TND)</label>
+           {{ form_widget(form.Montant,  {'attr': {'class': 'form-control mb-2'}}) }}
+            <label>Periode(Ans)</label>
+            {{ form_widget(form.Periode, {'attr': {'class': 'form-control mb-2'}})}}
 
 
 
-            <div style="display: none">{{ form_row(form.Interet,{'attr': {'class': 'form-control mb-3'}}) }}</div>
+            <div style="display: none">{{ form_widget(form.Interet,{'attr': {'class': 'form-control mb-3'}}) }}</div>
+
             {{ form_row(form.description,{'attr': {'class': 'form-control'}} ) }}
             <div style="display: none">{{ form_row(form.Status,{'attr': {'class': 'form-control mb-3'}}) }}</div>
             <div style="display: none">{{ form_row(form.PretId,{'attr': {'class': 'form-control mb-3'}}) }}</div>

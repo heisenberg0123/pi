@@ -1,0 +1,10 @@
+{% extends 'staffdash/index.html.twig' %}
+{% block body %}
+    <main id="main" class="main">
+
+        {% include "staffdash/Rembourssement/table.html.twig" %}
+
+        <button class="btn btn-danger"><a href="{{ path('pdf') }}">PDF</a></button>
+    </main>
+
+{% endblock %}

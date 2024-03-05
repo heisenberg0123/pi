@@ -27,6 +27,9 @@ class Remboursement
     #[ORM\ManyToOne(inversedBy: 'remboursements')]
     private ?Pret $rmb = null;
 
+    #[ORM\Column]
+    private ?bool $Status = null;
+
 
 
 
@@ -81,6 +84,18 @@ class Remboursement
     public function setRmb(?Pret $rmb): static
     {
         $this->rmb = $rmb;
+
+        return $this;
+    }
+
+    public function isStatus(): ?bool
+    {
+        return $this->Status;
+    }
+
+    public function setStatus(bool $Status): static
+    {
+        $this->Status = $Status;
 
         return $this;
     }

@@ -8,10 +8,16 @@ use App\Form\PretType;
 use App\Form\RemboursementType;
 use App\Repository\PretRepository;
 use App\Repository\RemboursementRepository;
+use App\service\MailerService;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Routing\Annotation\Route;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 class StaffdashController extends AbstractController
 {
@@ -56,24 +62,32 @@ class StaffdashController extends AbstractController
     }
 
 #[Route('/accepte/{id}', name: 'accepte')]
-public function accepte( PretRepository $em,$id){
+public function accepte( PretRepository $em,$id,MailerService $mailer){
 
   $pret=$em->find($id);
         $pret->setAccepte(true);
         $pret->setRefuse(false);
         $em=$this->getDoctrine()->getManager();
         $em->flush();
+    $message="success";
+    $mailer->sendEmail(content: $message);
+    $MAILER_DSN='gmail+smtp://domamain01@gmail.com:aqgpyzrrwvjcrejf@default';
+    $transport= Transport::fromDsn($MAILER_DSN);
+    $mailer=new Mailer($transport);
         return $this->redirectToRoute('prett');
 }
 
 #[Route('/refuse/{id}', name: 'refuse')]
-public function refuse(PretRepository $em,$id)
+public function refuse(PretRepository $em,$id,MailerService $mailer )
 {
     $pret=$em->find($id);
     $pret->setRefuse(true);
     $pret->setAccepte(false);
     $em=$this->getDoctrine()->getManager();
     $em->flush();
+    $message="success";
+    $mailer->sendEmail(content: $message);
+
     return $this->redirectToRoute('prett');
 }
 
@@ -121,7 +135,7 @@ public function refuse(PretRepository $em,$id)
     #[Route('/addr', name: 'adddr')]
     public function add(Request $request){
         $prett=new Remboursement();
-
+$prett->setStatus(false);
 
         $form=$this->createForm(RemboursementType::class, $prett);
         $form->handleRequest($request);
@@ -173,5 +187,67 @@ public function refuse(PretRepository $em,$id)
     }
 
 
+    #[Route('/pdf',name:'pdf')]
+    public function pdfgenerate(Request $req,RemboursementRepository $repo):Response
+    {
+        $pdfOption = new Options();
+        $pdfOption->set('defaultFont','Arial');
+        $pdfOption->setIsRemoteEnabled(true);
+
+        $dompdf=new Dompdf($pdfOption);
+        $context= stream_context_create([
+            'ssl' => [
+                'verify_peer'=>False,
+                'verify_peer_name'=>False,
+                'allow_self_signed'=>True
+            ]
+        ]);
+        $fact=$repo->findAll();
+
+
+        $dompdf->setHttpContext($context);
+        $html=$this->renderView('staffdash/Rembourssement/table.html.twig',['pret'=>$fact]);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4');
+        $dompdf->render();
+        $fichier='Rembourssement_Complet.pdf';
+
+        $dompdf->stream($fichier,[
+            'Attachement'=>true
+        ]);
+        return new Response();
+    }
+
+
+
+    #[Route('/complet/{id}', name: 'complet')]
+    public function complet( RemboursementRepository $em,$id,MailerService $mailer){
+
+        $pret=$em->find($id);
+        $pret->setStatus(true);
+
+        $em=$this->getDoctrine()->getManager();
+        $em->flush();
+        $message="success";
+        $mailer->sendEmail(content: $message);
+        $MAILER_DSN='gmail+smtp://domamain01@gmail.com:aqgpyzrrwvjcrejf@default';
+        $transport= Transport::fromDsn($MAILER_DSN);
+        $mailer=new Mailer($transport);
+        return $this->redirectToRoute('listr');
+    }
+
+
+
+    #[Route('/listc', name: 'listc')]
+    public function listc(RemboursementRepository $emm)
+    {
+
+        $author = $emm->findAll();
+
+        return $this->render('staffdash/Rembourssement/complet.html.twig', [
+            'pret' =>$author,
+
+        ]);
+    }
 
 }
